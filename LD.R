@@ -2,22 +2,26 @@
 ###############################################
 #outfileABHTT <- outfileABHTT[-1]
 #outfileABHT <- outfileABHTTTT
-
+outfileABHTLast3 <- outfileABH3
 ##Extract ID column and also, Chromosome and Position rows from the data
 library(dplyr)
 library(tidyr)
-outtest <- outfileABHT[-c(1:2), -c(1:2)]
+outfileABH  <- X2018G2FPHGABH
+outfileABH <- outfileABHT
+outfileABHT <- outfileABH
+outtest <- outfileABH[-c(1:1), -c(1:1)]
 ABHdf <- outtest
 
 ##Create data frames that you will use as storage of your data
+
 i=1
 j = i+1
 ABHdf2 <- ABHdf
 Storageytoremove2 <- ABHdf
 Newdataframe <- Storageytoremove2[,-c(1:ncol(Storageytoremove2))]
 Newdataframe2 <- Newdataframe
-Newdataframe3 <- outfileABHT
-Newdataframe3 <- Newdataframe3[,-c(1:ncol(outfileABHT))]
+Newdataframe3 <- outfileABH
+Newdataframe3 <- Newdataframe3[,-c(1:ncol(outfileABH))]
 Newdataframe4 <- Newdataframe
 Newdataframe5 <- Newdataframe4
 Newdataframe6 <- Newdataframe5
@@ -29,6 +33,8 @@ colnumy <- c(j:ncol(ABHdf))
 
 ## Start the loop at this point.
 for (i in 1:ncol(ABHdf)){
+  missingx <- 0
+  missingy <- 0
   x = colnumx[i]
   y = colnumy[i]
   namex <- colnames(ABHdf[x])
@@ -39,30 +45,15 @@ for (i in 1:ncol(ABHdf)){
   columnmx <- as.data.frame(columnmx)
   
   ## Take out the data which has >%20 of missing markers 
-  if(is.na(columnmx)==TRUE){
-    missingx <- sum(is.na(columnmx))
-    missingx <- missingx/174
-    if(missingx>0.20){
-      Newdataframe4 <-cbind(Newdataframe4,ABHdf2[x]) 
-      print(">20%")
-    } else if (is.na(columnmx)==FALSE){
-      missingx = 0
-    }
-  }
-  
-  ## Try to take into account of missing values 
-  columnmy <- ABHdf$y
-  columnmy <- as.data.frame(columnmy)
-  if(is.na(columnmy)==TRUE){
-    missingy <- sum(is.na(columnmy))
-    missingy <- missingy/174 ##!!Don´t forget to change this value if number of individuals change!
-    if(missingx>0.20){
-      Newdataframe5 <-cbind(Newdataframe5,ABHdf2[y]) 
-      print(">20%")
-    } else if (is.na(columnmy)==FALSE){
-      missingy = 0
-    }
-  }
+  missingx <- sum(is.na(columnmx))
+  missingx <- missingx/306 ##!!Don´t forget to change this value if number of individuals change!
+  missingy <- sum(is.na(columnmy))
+  missingy <- missingy/306 ##!!Don´t forget to change this value if number of individuals change!
+  ifelse(missingx>0.003, Newdataframe4 <-cbind(Newdataframe4,ABHdf2[x]),print("<0.0032"))
+  ifelse(missingy>0.003, Newdataframe4 <-cbind(Newdataframe4,ABHdf2[x]),print("<0.0032"))
+  #Newdataframe4 <-cbind(Newdataframe4,ABHdf2[x])
+  #print(">0.05")
+
   columnmx <- drop_na(columnmx)
   columnmy <- drop_na(columnmy)
   mycount <- columnmx %>% count(columnmx, sort = FALSE)
@@ -159,7 +150,7 @@ for (i in 1:ncol(ABHdf)){
   r2 <- as.numeric(r2)
   r2na = is.na(r2)
   ##!!!! Don't forget to roll the number because sometimes r2 could be 0.9999 instead of 1!
-  r2 <- format(round(r2, 3), nsmall = 3)
+  r2 <- format(round(r2, 2), nsmall = 2)
   r2 <- as.numeric(r2)
   
   ##If r2 is lower than 1 keep those values into the data frame
@@ -172,16 +163,17 @@ for (i in 1:ncol(ABHdf)){
       colnames(ABHdf)[x] <- namex
       colnames(ABHdf)[y] <- namey
       print("Pass")
-    } else if(r2 > 1){
-      colnames(ABHdf)[x] <- namex
-      colnames(ABHdf)[y] <- namey
-      print("fail")
+    } else if(r2 > 1.00){
+        colnames(ABHdf)[x] <- namex
+        colnames(ABHdf)[y] <- namey
+        print("fail")
     } else if(r2 == 1){
       colnames(ABHdf)[x] <- namex
       colnames(ABHdf)[y] <- namey
-      Newdataframe3 <- cbind(Newdataframe3,outfileABHT[y])
+      Newdataframe3 <- cbind(Newdataframe3,outfileABH[y])
       Newdataframe <- ABHdf[y]
       Newdataframe2 <- cbind(Newdataframe2,Newdataframe)
+      print("r2=1")
     } 
   }
   if(r2na == TRUE){
@@ -205,17 +197,25 @@ for (i in 1:ncol(ABHdf)){
 }  
 
 ##Extract markers which has r2=1 from the original data 
-outfileABHTT <- outfileABHT
-outfileABHTT = outfileABHTT[,!(names(outfileABHTT) %in% colnames(Newdataframe2))]
-outfileABHTT = outfileABHTT[,!(names(outfileABHTT) %in% colnames(Newdataframe4))]
-outfileABHTT = outfileABHTT[,!(names(outfileABHTT) %in% colnames(Newdataframe5))]
-outfileABHTT = outfileABHTT[,!(names(outfileABHTT) %in% colnames(Newdataframe6))]
+outfileABHTT <- outfileABH
+outfileABHTT <- outfileABHTT[,!(names(outfileABHTT) %in% colnames(Newdataframe2))]
+outfileABHTT <- outfileABHTT[,!(names(outfileABHTT) %in% colnames(Newdataframe4))]
+outfileABHTT <- outfileABHTT[,!(names(outfileABHTT) %in% colnames(Newdataframe5))]
+outfileABHTT <- outfileABHTT[,!(names(outfileABHTT) %in% colnames(Newdataframe6))]
+outfileABH <- outfileABHTT
+outtest <- outfileABH[-c(1:1), -c(1:1)]
+ABHdf <- outtest
+ABHdf2 <- ABHdf
+outfileABHT <- outfileABH
 
 ##Save your data
-setwd("C://R(MoveLater)//Genofile")
-write.csv(outfileABHTT, file = "outfileABHTLast3.csv", row.names = FALSE)
-write.csv(Newdataframe3, file = "r2-1-5markers.csv")
-write.csv(Newdataframe4, file = "20%markers11.csv")
-write.csv(Newdataframe5, file = "20%markers2-1.csv")
+setwd("C://R(MoveLater)//2018GenoandPheno//Geno")
+write.csv(outfileABHTT, file = "outfileABHT.csv", row.names = FALSE)
+write.csv(Newdataframe3, file = "r2-2markers.csv")
+write.csv(Newdataframe4, file = "missingmarkers3.csv")
+write.csv(Newdataframe5, file = "20%markers2-3.csv")
 write.csv(Newdataframe6, file = "Monomarkers.csv")
 ###############
+
+marker.positions <- marker.positions[1,]/1000000
+write.csv(marker.positions, file = "markerposs.csv")
