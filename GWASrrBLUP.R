@@ -1,6 +1,6 @@
 install.packages("rrBLUP")
 library(rrBLUP)
-
+###
 
 outfileABHTwithpos2 <- t(outfileABHTwithpos)
 write.table(outfileABHTwithpos2, row.names = F, col.names = F, file = "GWASgeno.txt")
