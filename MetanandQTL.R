@@ -5,12 +5,15 @@ library(lmem.qtler)
 ###################
 ####Calculating the BLUP values######
 ?gamem_met
+
+setwd("P:/R(MoveLater)/2018GenoandPheno/Pheno")
 mixed_mod <- gamem_met(g2f_2018_hybrid_data_clean_tester,
                         env = Location,
                         gen = Pedigree,
                         rep = Replicate,
                        block = Tester,
                         resp = everything(),
+                       random = "all",
                         verbose = FALSE)
 
 mixed_mod1 <- gamem_met(TestPhenoCov,
@@ -25,9 +28,10 @@ Positions <- read.csv("C:/R(MoveLater)/2018GenoandPheno/Geno/Positions.txt", row
 library(data.table)
 Positions <- transpose(Positions)
 write.table(Positions, file = "C:/R(MoveLater)/2018GenoandPheno/Geno/Positions2.txt", row.names = FALSE, col.names = FALSE)
-subsetting <- outfileABHT[1]
+subsetting <- outfileABHTnum[1]
 subsetting <- subsetting[-1,]
-sub2 <- data3[,!(rownames(subsetting) %in% rownames(data3))]
+data3$GEN <- as.character(data3$GEN)
+sub2 <- setDT(data3)[GEN %chin% subsetting$id] 
 ############
 
 plot(mixed_mod1) # The S3 generic function plot() is used to generate diagnostic plots of residuals of the model.
